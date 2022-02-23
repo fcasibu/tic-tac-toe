@@ -1,3 +1,11 @@
+:root {
+  --light-shade: #ecefec;
+  --light-accent: #ef3b66;
+  --primary-color: #939396;
+  --dark-accent: #9c4747;
+  --dark-shade: #2f3b44;
+}
+
 *,
 *::before,
 *::after {
@@ -7,9 +15,10 @@
 }
 
 body {
-  background: #333;
-  color: #fff;
+  background: var(--light-shade);
+  color: var(--dark-shade);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
@@ -17,9 +26,8 @@ body {
 
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, 150px);
   grid-auto-rows: 150px;
-  border: 1px solid #fff;
   width: 500px;
 }
 
@@ -29,6 +37,11 @@ body {
   justify-content: center;
   font-size: 3rem;
   font-weight: bold;
-  border: 1px solid #fff;
+  border: 1px solid var(--dark-shade);
   cursor: pointer;
+}
+
+
+.item:hover {
+  background: #dddddd;
 }

@@ -38,34 +38,58 @@ const Gameboard = (() => {
   const gameBoard = ["", "", "", "", "", "", "", "", ""];
   const items = document.querySelectorAll(".item");
   const players = Players("X", "O");
-  let currentPlayer = players.player1;
+  let currentPlayer = [];
+  let count = 0;
 
-  const addMarker = () => {
-    items.forEach((item) =>
-      item.addEventListener("click", () => {
-        const index = +item.dataset.index;
-        if (currentPlayer === players.player1) {
-          if (!item.textContent) {
-            item.textContent = players.player1;
-            currentPlayer = players.player2;
-            gameBoard.splice(index, 1, item.textContent);
-          }
-        } else if (currentPlayer === players.player2) {
-          if (!item.textContent) {
-            item.textContent = players.player2;
-            currentPlayer = players.player1;
-            gameBoard.splice(index, 1, item.textContent);
-          }
-        }
-      })
-    );
-  };
-
-  const checkWinner = () => {
-    if (condition(gameBoard, currentPlayer)) {
-      console.log(`${currentPlayer}`);
+  const addMarker = (e) => {
+    let endArr = currentPlayer.length - 1;
+    if (!e.target.textContent) {
+      if (!currentPlayer.length || currentPlayer[endArr] === players.player2) {
+        e.target.textContent = players.player1;
+        currentPlayer.push(players.player1);
+        count++;
+      } else if (currentPlayer[endArr] === players.player1) {
+        e.target.textContent = players.player2;
+        currentPlayer.push(players.player2);
+        count++;
+      }
     }
   };
 
-  return { gameBoard, items, addMarker, checkWinner };
+  const displayController = (e) => {
+    const index = e.target.dataset.index;
+    addMarker(e);
+    gameBoard.splice(index, 1, e.target.textContent);
+    checkWinner();
+  };
+
+  const checkWinner = () => {
+    let endArr = currentPlayer.length - 1;
+    if (condition(gameBoard, currentPlayer[endArr])) {
+      alert(`${currentPlayer.pop()} won`);
+      clearBoard();
+    } else if (count === 9 && !condition(gameBoard, currentPlayer[endArr])) {
+      alert("It's a tie");
+      clearBoard();
+    }
+  };
+
+  const clearBoard = () => {
+    for (let i = 0; i < gameBoard.length; i++) {
+      gameBoard.splice(i, 1, "");
+      items[i].textContent = "";
+      currentPlayer = [];
+      count = 0;
+    }
+  };
+
+  return {
+    gameBoard,
+    items,
+    displayController
+  };
 })();
+
+document.addEventListener("click", (e) => {
+  Gameboard.displayController(e);
+});
