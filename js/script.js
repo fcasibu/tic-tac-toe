@@ -43,15 +43,22 @@ const Gameboard = (() => {
 
   const addMarker = (e) => {
     let endArr = currentPlayer.length - 1;
-    if (!e.target.textContent) {
-      if (!currentPlayer.length || currentPlayer[endArr] === players.player2) {
-        e.target.textContent = players.player1;
-        currentPlayer.push(players.player1);
-        count++;
-      } else if (currentPlayer[endArr] === players.player1) {
-        e.target.textContent = players.player2;
-        currentPlayer.push(players.player2);
-        count++;
+    if (e.target.classList.contains("mark")) {
+      if (!e.target.textContent) {
+        if (
+          !currentPlayer.length ||
+          currentPlayer[endArr] === players.player2
+        ) {
+          e.target.textContent = players.player1;
+          currentPlayer.push(players.player1);
+          count++;
+        } else if (currentPlayer[endArr] === players.player1) {
+          e.target.textContent = players.player2;
+          currentPlayer.push(players.player2);
+          count++;
+        }
+      } else {
+        console.log("not empty");
       }
     }
   };
@@ -59,8 +66,39 @@ const Gameboard = (() => {
   const displayController = (e) => {
     const index = e.target.dataset.index;
     addMarker(e);
-    gameBoard.splice(index, 1, e.target.textContent);
-    checkWinner();
+    styleText(e);
+    gameBoard.splice(index, 1, currentPlayer[currentPlayer.length - 1]);
+    currentTurn();
+    console.log(count);
+    setTimeout(() => {
+      checkWinner();
+    }, 1000);
+  };
+
+  const styleText = (e) => {
+    if (e.target.classList.contains("mark")) {
+      if (e.target.textContent === players.player1) {
+        e.target.style.color = "var(--light-accent)";
+        e.target.style.textShadow = "0 0 1rem var(--light-accent)";
+      } else {
+        e.target.style.color = "var(--success)";
+        e.target.style.textShadow = "0 0 1rem var(--success)";
+      }
+    }
+  };
+
+  const currentTurn = () => {
+    const playerTurns = document.querySelectorAll(".turn");
+    if (
+      currentPlayer[currentPlayer.length - 1] === players.player2 ||
+      !currentPlayer.length
+    ) {
+      playerTurns[0].classList.add("player-one-transition");
+      playerTurns[1].classList.remove("player-two-transition");
+    } else if (currentPlayer[currentPlayer.length - 1] === players.player1) {
+      playerTurns[1].classList.add("player-two-transition");
+      playerTurns[0].classList.remove("player-one-transition");
+    }
   };
 
   const checkWinner = () => {
@@ -77,19 +115,28 @@ const Gameboard = (() => {
   const clearBoard = () => {
     for (let i = 0; i < gameBoard.length; i++) {
       gameBoard.splice(i, 1, "");
-      items[i].textContent = "";
+      items[i].children[0].textContent = "";
       currentPlayer = [];
       count = 0;
+    }
+    currentTurn();
+  };
+
+  const resetBoard = (e) => {
+    if (e.target.classList.contains("reset")) {
+      clearBoard();
     }
   };
 
   return {
-    gameBoard,
-    items,
-    displayController
+    displayController,
+    currentTurn,
+    resetBoard
   };
 })();
 
+Gameboard.currentTurn();
 document.addEventListener("click", (e) => {
   Gameboard.displayController(e);
+  Gameboard.resetBoard(e);
 });
